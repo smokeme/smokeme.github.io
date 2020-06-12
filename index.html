@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How not to use a payment gateway</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__left">
+    <div class="stackedit__toc">
+      
+<ul>
+<li><a href="#how-not-to-use-a-payment-gateway">How not to use a payment gateway</a>
+<ul>
+<li><a href="#what-is-a-payment-gateway">What is a payment gateway?</a></li>
+<li><a href="#how-does-it-work-k-net">How does it work? (K-NET)</a></li>
+<li><a href="#how-it-can-go-horribly-wrong">How it can go horribly wrong?</a></li>
+<li><a href="#how-it-should-go">How it should go?</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="stackedit__right">
+    <div class="stackedit__html">
+      <h1 id="how-not-to-use-a-payment-gateway">How not to use a payment gateway</h1>
+<h2 id="what-is-a-payment-gateway">What is a payment gateway?</h2>
+<p>A way to connect you to K-NET or VISA/MasterCard to allow your userbase to purchase items/subscriptions from your website or application</p>
+<p>For example:</p>
+<ol>
+<li>Tap</li>
+<li>MyFatoorah</li>
+<li>Upay</li>
+<li>Hesabe</li>
+<li>etc…</li>
+</ol>
+<h2 id="how-does-it-work-k-net">How does it work? (K-NET)</h2>
+<p><img src="https://i.imgur.com/h77spmi.png" alt="enter image description here"></p>
+<ol>
+<li>As a user you send a <code>request</code> to make a purchase</li>
+<li>The application server will <code>request</code> a payment url from the payment gateway with the specific amount &amp; something called a <strong>success_url</strong> and a <strong>error_url</strong> and maybe a <strong>results or response url</strong> based on your initial request</li>
+<li>The payment gateway will give the server some information most importantly ( <strong>Payment_id</strong> ,  <strong>Transaction_id</strong>, <strong>Tracking_id</strong>, <strong>Payment_URL</strong> )</li>
+<li>The application server will give the user back the payment URL so he can make his purchase and the server will save the values in the database until we verify it was actually paid</li>
+<li>After the payment has been done by the user it will redirect him to the <strong>success_url</strong> with the payment information, most importantly the <strong>status/result</strong> of the transaction which is <code>CAPTURED</code>, if the status/result isn’t <code>CAPTURED</code> then the transaction failed</li>
+<li>Server will validate the data using the payment_id and it will make sure to set your transaction as paid in the database</li>
+</ol>
+<h2 id="how-it-can-go-horribly-wrong">How it can go horribly wrong?</h2>
+<p>Try and think of a scenario where doing this might be wrong</p>
+<p>You done?<br>
+<img src="https://i.imgur.com/0t6D1mW.png" alt="enter image description here"><br>
+Well let’s look at the normal <strong>K-NET</strong> payment url and we should notice something</p>
+<p><img src="https://i.imgur.com/YeeMXAL.png" alt="enter image description here"></p>
+<p>There is a <strong>GET</strong> parameter with the paymentID right there, and that is the same paymentID that we validate the payment thru <code>(Unique Identifier)</code></p>
+<p>Some of the implementations of payment gateway’s are done horribly, They will get all of the above information ( <strong>Payment_id</strong> , <strong>Transaction_id</strong>, <strong>Tracking_id</strong> ) and will only validate your payment using the <strong>Payment_id</strong> which leaves their website vulnerable to payment forgery</p>
+<p>If they check only by using 1 known piece of data which is <strong>Payment_id</strong> then it’s done wrong, but if they mix it up and validate using two pieces of data for example (<strong>Payment_id</strong> and <strong>Transaction_id</strong> ) while keeping the transaction_id hidden from the user until he hits the success page or error page then that makes it a bit safer, but the same can be done here</p>
+<p>We cancel the payment mid way thru, stop our browser from hitting the error_page and grab the <strong>Transaction_id</strong> if it was visible there and still do the payment forgery with the two pieces of information there</p>
+<p>And that is why we need a piece of info that isn’t visible in error page or the success page to validate the payment</p>
+<h2 id="how-it-should-go">How it should go?</h2>
+<p>After a user makes a payment and sends the paymentID back to the server, the server should make a request to the payment gateway asking about the status of this payment and then assigning it a proper status from the response of the server and not from the user’s data as user’s can be <strong>Evil</strong></p>
+<p>Or they should use the <strong>response url</strong> we mentioned earlier where the payment server will automatically send a <strong>POST</strong> request with the payment’s data back to the server for a validation (<code>That can be compromised too if an Evil user knew the response url from an opensource codebase without proper checks on the IP of the requester aka payment gateway</code>)</p>
+
+    </div>
+  </div>
+</body>
+
+</html>
