@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -19,6 +19,7 @@
 <li><a href="#how-does-it-work-k-net">How does it work? (K-NET)</a></li>
 <li><a href="#how-it-can-go-horribly-wrong">How it can go horribly wrong?</a></li>
 <li><a href="#how-it-should-go">How it should go?</a></li>
+<li><a href="#contact">Contact</a></li>
 </ul>
 </li>
 </ul>
@@ -62,6 +63,11 @@ Well let’s look at the normal <strong>K-NET</strong> payment url and we should
 <h2 id="how-it-should-go">How it should go?</h2>
 <p>After a user makes a payment and sends the paymentID back to the server, the server should make a request to the payment gateway asking about the status of this payment and then assigning it a proper status from the response of the server and not from the user’s data as user’s can be <strong>Evil</strong></p>
 <p>Or they should use the <strong>response url</strong> we mentioned earlier where the payment server will automatically send a <strong>POST</strong> request with the payment’s data back to the server for a validation (<code>That can be compromised too if an Evil user knew the response url from an opensource codebase without proper checks on the IP of the requester aka payment gateway</code>)</p>
+<h2 id="contact">Contact</h2>
+<blockquote>
+<p><a href="mailto:Fawaz@joincoded.com">Fawaz@joincoded.com</a><br>
+Twitter: @Q8fawazo</p>
+</blockquote>
 
     </div>
   </div>
